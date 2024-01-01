@@ -1,0 +1,24 @@
+{% extends 'index.html' %}
+
+{% block title %}Home - Your App{% endblock %}
+
+{% block content %}
+    
+    <h2>Create user</h2>
+    {% if message %}
+    <p>{{message}}</p>
+    {% endif %}
+    <p>Password must be at least eight characters long and include one number. The username will be created by combining the user's first name and class name.</p>
+    <form method="post" actions="{% url 'admin_create_user' %}">
+    {% csrf_token %}
+    {% for field in form %}
+        {{field.label}}
+        {{field}}
+        <br>
+    {%endfor%}
+    <button type="submit">Create user</button>
+    </form>
+    
+    
+    
+{% endblock %}

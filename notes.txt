@@ -1,0 +1,3 @@
+render the data in add/delete students with a table so it is more lined up - done
+allow teachers to edit an amount of attempts for each student and an amount of seconds using a Settings model onetoone with each user
+fix @csrf exemption on create attempt by using javascript csrf generation

@@ -1,0 +1,181 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <h2>Set Work</h2>
+    <p>Assign different times tables to the students in your class.</p>
+    {% if update_message %}
+        {{update_message}}
+    {% endif %}
+    <form method="post" action="{% url 'teacher_set_work' %}">
+    {% csrf_token %}
+    
+    {% for table in array_of_tables %}
+    
+    {% for t in table%}
+    {% if forloop.first %}
+        <!-- This is the first iteration -->
+        <p>{{t.user_tested}} </p>
+    {% endif %}
+        
+    
+        {%if t.set%}
+            <div style="display:inline" class="checkboxholder" >
+            <div style="display:inline-block" >
+            <label>{{t.table_tested}}</label>
+            <br>
+            <input class="table{{t.table_tested}}"  type="checkbox"  name="set" value="{{t.user_tested}}:{{t.table_tested}}" checked>
+            </div>
+            </div>
+        
+        {%else%}
+            <div style="display:inline" class="checkboxholder" >
+            <div style="display:inline-block" >
+            <label>{{t.table_tested}}</label>
+            <br>
+            <input class="table{{t.table_tested}}"  type="checkbox"  name="set" value="{{t.user_tested}}:{{t.table_tested}}">
+            </div>
+            </div>
+        
+        {%endif%}
+       
+    {% endfor %}
+    
+    <br>
+    {% endfor %}
+    <br>
+    <button type="submit">Submit</button>
+    </form>
+    <br>
+    <button style="font-size: 16px;" onclick="toggleVisible()">
+        Edit whole class
+    </button>
+    <div id="wholeClassEdit" style="display:none;">
+        <p>
+            Caution: Checking this box will update each individual's set work. Use refresh to undo any unwanted changes before submitting. 
+        </p>
+        <div style="display:inline" class="checkboxholder" >
+        <div style="display:inline-block" >
+            <label>2</label>
+            <br>
+            <input id="2"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder" >
+        <div style="display:inline-block" >
+            <label>3</label>
+            <br>
+            <input id="3"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline"  class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>4</label>
+            <br>
+            <input id="4"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>5</label>
+            <br>
+            <input id="5"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>6</label>
+            <br>
+            <input id="6"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>7</label>
+            <br>
+            <input id="7"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>8</label>
+            <br>
+            <input id="8"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>9</label>
+            <br>
+            <input id="9"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>10</label>
+            <br>
+            <input id="10"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>11</label>
+            <br>
+            <input id="11"  type="checkbox"  unchecked>
+        </div>
+        </div>
+        <div style="display:inline" class="checkboxholder">
+        <div style="display:inline-block" >
+            <label>12</label>
+            <br>
+            <input id="12"  type="checkbox"  unchecked>
+        </div>
+        </div>
+    </div>
+    <script>
+
+    function toggleVisible(){
+        let wholeClassEdit = document.getElementById('wholeClassEdit')
+        if (wholeClassEdit.style.display=='none'){
+            wholeClassEdit.style.display ='block'
+        }
+        else{
+            wholeClassEdit.style.display ='none';
+        }
+    }
+
+
+    boxArray = []
+    controlledCheckboxArray = []
+    for(let i = 2;i<13;i++){
+        window['box' + i] = document.getElementById(`${i}`);
+        boxArray.push(window['box' + i])
+        window['controlledCheckboxes' + i] = document.querySelectorAll(`.table${i}`);
+        controlledCheckboxArray.push(window['controlledCheckboxes' + i])
+    }
+    console.log(boxArray)
+    console.log(controlledCheckboxArray)
+
+
+    for(let i = 0;i<11;i++){
+        document.addEventListener('DOMContentLoaded', function() {
+        // Add an event listener to the main checkbox
+            boxArray[i].addEventListener('change', function() {
+            // Check if the main checkbox is checked or not
+                if (boxArray[i].checked) {
+                    // If checked, loop through all controlled checkboxes and check them
+                    controlledCheckboxArray[i].forEach(function(checkbox) {
+                        checkbox.checked = true;
+                    });
+                } 
+                else {
+                    // If not checked, loop through all controlled checkboxes and uncheck them
+                    controlledCheckboxArray[i].forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
+                }
+            });
+        });
+    };
+    
+    </script>
+{% endblock %}

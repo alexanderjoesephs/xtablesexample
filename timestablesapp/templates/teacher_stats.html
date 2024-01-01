@@ -1,0 +1,102 @@
+{% extends 'index.html' %}
+
+{% block title %}Home - Your App{% endblock %}
+
+{% block content %}
+    <h2>View Stats</h2>
+    <p>View stats for students or a whole class for a particular time frame.</p>
+    <form method="post" action="{% url 'teacher_stats'%}">
+        {% csrf_token %}
+        <div style="display: inline-block" class="formdiv">
+        
+        <input type="radio" id="wholeClass" name="data type" value="whole class" checked>
+        <label for="option1">Whole class</label><br>
+        <input type="radio" id="individualStudent" name="data type" value="individual student" >
+        <label for="option2">Individual student</label><br>
+        
+        </div>
+        <div style="display: inline-block; color: grey;" id="studentSelectDiv" class="formdiv">
+            <label for="selectStudent">Select a student</label>
+            <select id="selectStudent" name="student" disabled>
+                {% for student in students %}
+                <option value="{{student}}">{{student}}</option>
+                {% endfor %}
+              </select>
+        </div>
+        <div style="display: inline-block" class="formdiv">
+            <label for="dateFrom">Date From:</label>
+            <input type="date" id="dateFrom" name="date_from">
+            <label for="dateTo">Date To:</label>
+            <input type="date" id="dateTo" name="date_to">
+        </div>
+        
+        <div style="display: inline-block" class="formdiv">
+            <button type="submit">Submit</button>
+        </div>
+        
+    </form>
+    {% if info_string %}
+        <h3>{{info_string}}</h3>
+    {% endif %}
+    {% if heatmap_image %}
+    <div class="graphContainer">
+        <img src="data:image/png;base64,{{ heatmap_image }}" alt="Heatmap">
+        <img src="data:image/png;base64,{{ heatmap_image2 }}" alt="Heatmap">
+    </div>
+    {% if heatmap_image3 and heatmap_image4 %}
+    <div>
+        <img src="data:image/png;base64,{{ heatmap_image3 }}" alt="Heatmap">
+        <img src="data:image/png;base64,{{ heatmap_image4 }}" alt="Heatmap">
+    </div>
+    {% endif %}
+    {% if heatmap_image5 %}
+    <div>
+        <img src="data:image/png;base64,{{ heatmap_image5 }}" alt="Heatmap">
+    </div>
+    {% endif %}
+    {% endif %}
+    <script>
+        let dropdown = document.getElementById("selectStudent");
+        let wholeClass = document.getElementById("wholeClass");
+        let individualStudent = document.getElementById("individualStudent");
+        let studentSelectDiv = document.getElementById('studentSelectDiv');
+        
+        
+        let today = new Date().toISOString().split('T')[0];
+        // Set the default value of the date input to today's date
+        document.getElementById('dateTo').value = today;
+
+        // Get today's date
+        let today2 = new Date();
+  
+        // Calculate the date one week ago
+        var oneWeekAgo = new Date(today);
+        oneWeekAgo.setDate(today2.getDate() - 7);
+  
+        // Convert the date to "YYYY-MM-DD" format
+        let formattedDate = oneWeekAgo.toISOString().split('T')[0];
+  
+        // Set the default value of the date input to one week ago
+        document.getElementById('dateFrom').value = formattedDate;
+        
+
+        wholeClass.addEventListener("change", function() {
+            if (this.checked) {
+            // Execute your JavaScript code here when Option 1 radio button is checked
+            dropdown.disabled = true;
+            studentSelectDiv.style.color = "grey";
+            
+        }});
+
+        individualStudent.addEventListener("change", function() {
+            if (this.checked) {
+            // Execute your JavaScript code here when Option 1 radio button is checked
+            dropdown.disabled = false;
+            studentSelectDiv.style.color = "black";
+        }});
+        
+
+
+        
+    </script>
+{% endblock %}

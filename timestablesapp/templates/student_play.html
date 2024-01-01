@@ -1,0 +1,167 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<script id="question-data" type="application/json">
+    {{ question_list|safe }}
+</script>
+<div class="gamecontainer">
+    <h2>Times tables app</h2>
+    <p style="display:none" id="username">{{request.user}}</p>
+    <p id="question"></p>
+    <input type="text" id="answer" autocomplete="off">
+    <p id="score">Score: 0</p>
+</div>
+    
+<script>
+    let scriptTag = document.getElementById('question-data');
+    let questionArray = JSON.parse(scriptTag.textContent || scriptTag.innerText);
+    console.log(questionArray)
+    let score = 0;
+    let asked = 0;
+    let turns = 25;
+    let seconds = 6;
+    let timer;
+    let startTime;
+    let user = document.getElementById('username').innerText;
+    //let tables = document.getElementsByClassName('timesTables');
+    //tablesArray = [];
+    //for(let i = 0;i<tables.length;i++){
+    //    let number = parseInt(tables[i].innerText)
+    //    tablesArray.push(number)
+    //}
+    //console.log(tablesArray);
+    //let amountOfTables = tablesArray.length;
+    let amountOfTables = questionArray.length;
+    let questionIndex = Math.floor(Math.random() * amountOfTables);
+    let question = questionArray[questionIndex]
+    
+    
+
+    function startTimer() {
+        if(asked<turns){
+            startTime = Date.now(); // Record the start time
+            timer = setTimeout(function() {
+                checkAnswer();
+                updateScore();
+                createQuestion();
+                startTimer();
+                
+
+            }, seconds*1000);
+        }
+        else{
+            console.log('activity finished');
+            document.getElementById('answer').remove();
+            let element = document.getElementById('question');
+            element.innerText = 'Activity finished';
+        }        
+        
+
+    }
+    function resetTimer() {
+        // Reset the timer by clearing the previous timeout and starting a new one
+        console.log('timer stopped');
+        clearTimeout(timer);
+        startTimer();
+    }
+
+    //CALL THIS WHEN ENTER PRESSED^
+
+
+
+    document.addEventListener('keydown', function(event) {
+        // Check if the pressed key is the desired key (e.g., 'a' or 'A')
+        if (event.key === 'Enter' && asked<turns) {
+        checkAnswer();
+        updateScore();
+        createQuestion();
+        resetTimer();
+        }
+    });
+
+
+    const inputField = document.getElementById('answer');
+
+    inputField.addEventListener('blur', function() {
+        inputField.focus();
+    });
+
+
+    window.onload = function() {
+        document.getElementById('answer').focus();
+        createQuestion();
+        startTimer();
+    };
+
+
+
+    function createQuestion(){
+        if(asked>24){
+            
+        }
+        else{
+            
+            amountOfTables = questionArray.length;
+            questionIndex = Math.floor(Math.random() * amountOfTables);
+            question = questionArray[questionIndex]
+            let element = document.getElementById('question');;
+            element.innerText = `${question[0]} x ${question[1]} =`;
+            //remove the item from question array
+            questionArray = questionArray.filter(item => item !== question);
+            if (questionArray.length==0){
+                console.log('reloading array')
+                questionArray = JSON.parse(scriptTag.textContent || scriptTag.innerText);
+            }
+        }
+    }
+
+    function checkAnswer (){
+        timeTaken = getElapsedTime();
+        console.log(`${timeTaken} ms elapsed`);
+        let correct = true;
+        let input = document.getElementById('answer');
+        if(input.value==question[0]*question[1]){
+            score++;
+            asked++;
+        }
+        else{
+            correct = false;
+            asked++;
+        }
+        var formData = new FormData();
+        formData.append('correct', correct);
+        formData.append('time_taken', timeTaken);
+        formData.append('user', user);
+        formData.append('x', question[0]);
+        formData.append('y', question[1]);
+
+        fetch('create_attempt', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Data sent successfully.');
+            } else {
+                console.error('Error:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+        input.value = "";
+    }
+
+    function updateScore(){
+        let displayScore = document.getElementById('score');
+        displayScore.innerText = `Score: ${score}/${asked}`;
+        document.getElementById('answer').focus();
+    }
+
+    function getElapsedTime() {
+        const elapsedTime = Date.now() - startTime;
+        return elapsedTime;
+    }
+</script>
+{% endblock %}

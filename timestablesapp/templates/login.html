@@ -1,0 +1,26 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<h2>Login</h2>
+{% if user.is_authenticated %}
+<p>You are logged in as {{request.user}}</p>
+<form method="post" action="{% url 'user_logout' %}">
+{% csrf_token %}
+<button type="submit">Logout</button>
+</form>
+{% else %}
+<form class="form" method="post" action="{% url 'user_login' %}">
+{% csrf_token %}
+<p>Username</p>
+<input name="username" type="text">
+<p>Password</p>
+<input name="password" type="password">
+<br>
+<button type="submit">Login</button>
+</form>
+{% endif %}
+{% if loginfailedmessage %}
+{{loginfailedmessage}}
+{%endif%}
+  
+{% endblock %}

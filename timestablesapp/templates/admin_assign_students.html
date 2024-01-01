@@ -1,0 +1,46 @@
+{% extends 'index.html' %}
+
+{% block title %}Home - Your App{% endblock %}
+
+{% block content %}
+    <h3>Assign students</h3>
+    {% if teacher_form %}
+        <p>These students have been assigned to {{teacher_form}}.</p>
+        <ul>
+           {% for student_name in student_form%}
+           <li>{{student_name}}</li>
+           {% endfor %}
+        </ul>
+    {% endif %}
+        <form method="post" action="{% url 'admin_assign_students' %}">
+
+            {% csrf_token %}
+            
+            <label for="selectTeacher">Select a teacher</label>
+            <select id="selectTeacher" name="teacher_selected">
+                {% for teacher in teachers %}
+                <option value="{{teacher}}">{{teacher}}</option>
+                {% endfor %}
+              </select>
+              <br>
+              <table style="max-width:300px; margin: 0 auto;">
+                <tbody>
+                
+                
+                
+              
+              {% for student in students %}
+              <tr>
+                <td >{{student}}</td>
+                <td width="50px"><input id="{{student}}id"  type="checkbox"  name="student" value="{{student}}"></td>
+              </tr>
+                
+                
+              {% endfor %}
+            </tbody>
+                </table>
+              
+              <br>
+              <button style="font-size:16px;" type="submit" name="submit">Assign students</button>
+    </form>
+{% endblock %}
