@@ -77,3 +77,16 @@ class Attempt(models.Model):
         else:
             return f'{self.user_asked} answered {self.question_asked} incorrectly'
         
+class Settings(models.Model):
+    number_of_questions = models.IntegerField(default=25,validators=[
+            MaxValueValidator(limit_value=100),
+            MinValueValidator(limit_value=1),
+        ])
+    number_of_seconds = models.IntegerField(default=6,validators=[
+            MaxValueValidator(limit_value=30),
+            MinValueValidator(limit_value=3),
+        ])
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    def __str__(self):
+        return(f'{self.user.username} answers {self.number_of_questions} questions in {self.number_of_seconds} seconds each')
+        

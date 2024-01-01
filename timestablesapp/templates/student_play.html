@@ -4,6 +4,11 @@
 <script id="question-data" type="application/json">
     {{ question_list|safe }}
 </script>
+<div style="display:none;">
+    <p id="questionSetting">{{questions}}</p>
+    <p id="secondSetting">{{seconds}}</p>
+    <p></p>
+</div>
 <div class="gamecontainer">
     <h2>Times tables app</h2>
     <p style="display:none" id="username">{{request.user}}</p>
@@ -18,8 +23,9 @@
     console.log(questionArray)
     let score = 0;
     let asked = 0;
-    let turns = 25;
-    let seconds = 6;
+    
+    let turns = Number(document.getElementById('questionSetting').innerText);
+    let seconds = Number(document.getElementById('secondSetting').innerText);
     let timer;
     let startTime;
     let user = document.getElementById('username').innerText;

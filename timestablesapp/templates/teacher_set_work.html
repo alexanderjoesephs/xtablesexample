@@ -10,7 +10,17 @@
     {% csrf_token %}
     
     {% for table in array_of_tables %}
-    
+    {% if forloop.counter|divisibleby:2 %}
+    <br>
+    {% for t in table %}
+      Number of questions
+      <input type="number" class="questions" value="{{t.number_of_questions}}" min="1" max="100" name="{{t.user}}questions">
+      <br>
+      Number of seconds
+      <input type="number" class="seconds" value="{{t.number_of_seconds}}" min="3" max="30" name="{{t.user}}seconds">
+      <br> 
+    {% endfor %}
+    {% else %}
     {% for t in table%}
     {% if forloop.first %}
         <!-- This is the first iteration -->
@@ -39,7 +49,7 @@
         {%endif%}
        
     {% endfor %}
-    
+    {% endif %}
     <br>
     {% endfor %}
     <br>
@@ -130,6 +140,13 @@
             <input id="12"  type="checkbox"  unchecked>
         </div>
         </div>
+        <br>
+        Number of questions
+        <input id="classQuestions" type="number"  min="1" max="100" >
+        <br>
+        Number of seconds
+        <input id="classSeconds" type="number"  min="3" max="30" >
+        <br> 
     </div>
     <script>
 
@@ -176,6 +193,32 @@
             });
         });
     };
+    let classQuestions = document.getElementById('classQuestions');
+    let classSeconds = document.getElementById('classSeconds');
+    let questionsArray = Array.from(document.getElementsByClassName('questions'));
+    let secondsArray = Array.from(document.getElementsByClassName('seconds'));
     
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add an event listener to the main checkbox
+        classQuestions.addEventListener('change', function() {
+            // Check if the main checkbox is checked or not
+            questionValue = classQuestions.value 
+            questionsArray.forEach(function(input) {
+                input.value = questionValue;
+            }); 
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add an event listener to the main checkbox
+        classSeconds.addEventListener('change', function() {
+            // Check if the main checkbox is checked or not
+            secondsValue = classSeconds.value 
+            secondsArray.forEach(function(input) {
+                input.value = secondsValue;
+            }); 
+        });
+    });
+
     </script>
 {% endblock %}

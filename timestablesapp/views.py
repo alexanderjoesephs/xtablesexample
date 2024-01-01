@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, HttpResponse
 #from .forms import CustomisedUserCreationForm
 from .forms import CustomUserCreationForm
-from .models import Question, Attempt, User, Teacher, Student, Test, Admin
+from .models import Question, Attempt, User, Teacher, Student, Test, Admin, Settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
@@ -78,7 +78,10 @@ def student_ready(request):
         test_list = []
         for number in times_tables:
             test_list.append(number.table_tested)
-    return render(request, 'student_ready.html',{'test_list':test_list})
+    settings = Settings.objects.get(user=request.user)
+    seconds = settings.number_of_seconds
+    questions = settings.number_of_questions
+    return render(request, 'student_ready.html',{'test_list':test_list,'seconds':seconds,'questions':questions})
 
 
 def student_play(request):
@@ -98,8 +101,12 @@ def student_play(request):
                 array.append(test)
                 array.append(i)
                 question_list.append(array)
-       
-        return render(request, 'student_play.html',{'question_list':question_list})
+        settings = Settings.objects.get(user=request.user)
+        seconds = settings.number_of_seconds
+        questions = settings.number_of_questions
+        print(seconds)
+        print(questions)
+        return render(request, 'student_play.html',{'question_list':question_list,'seconds':seconds,'questions':questions})
 
 @csrf_exempt  # Only for example. Use CSRF protection in production.
 def create_attempt(request):
@@ -353,15 +360,25 @@ def teacher_set_work(request):
             this_teacher = Teacher.objects.get(user = request.user)
             students = Student.objects.filter(classes=this_teacher)
             array_of_tables = []
+            array_of_settings = []
             for student in students:
                 user = User.objects.get(id=student.user.id)
                 tables = Test.objects.filter(user_tested=user)
                 array_of_tables.append(tables)
-
+                settings = Settings.objects.filter(user=user)
+                array_of_tables.append(settings)
+            
+            print('studnets')
+            print(students)
+            print('array_of_tables')
+            print(array_of_tables)
+            print('array_of_tables length')
+            print(len(array_of_tables))
             return render(request,'teacher_set_work.html',{'students':students,'array_of_tables':array_of_tables})
         else:
             return render(request,'error.html',{'error':'Not logged in as teacher.'})
     if request.method == "POST":
+        print(request.POST)
         results = request.POST.getlist('set')
         this_teacher = Teacher.objects.get(user = request.user)
         students = Student.objects.filter(classes=this_teacher)
@@ -375,11 +392,29 @@ def teacher_set_work(request):
                 else:
                     test.set = False
                 test.save()
+        
+        
+        for student in students:
+            print('printing student')
+            print(student)
+            questions =  request.POST.get(f'{student}questions')
+            seconds =  request.POST.get(f'{student}seconds')
+            user_settings = User.objects.get(username=student)
+            settings = Settings.objects.get(user=user_settings)
+            settings.number_of_questions = questions
+            settings.number_of_seconds = seconds
+            settings.save()
+
+            
+
         array_of_tables = []
         for student in students:
                 user = User.objects.get(id=student.user.id)
                 tables = Test.objects.filter(user_tested=user)
                 array_of_tables.append(tables)
+                settings = Settings.objects.filter(user=user)
+                array_of_tables.append(settings)
+        
         return render(request,'teacher_set_work.html',{'students':students,'array_of_tables':array_of_tables,'update_message':'Work set has been updated.'})
     
 
@@ -1026,7 +1061,7 @@ def admin_create_user(request):
             form = CustomUserCreationForm(request.POST)
             if form.is_valid():
                 form.save()
-                username = form.cleaned_data['first_name'] + form.cleaned_data['class_name']
+                username = form.cleaned_data['username']
                 user_to_assign_times_tables = User.objects.get(username=username)
                 admin_creating_account = Admin.objects.get(user=request.user)
                 for i in range(2,13):
@@ -1035,6 +1070,9 @@ def admin_create_user(request):
                     test.table_tested = i
                     test.user_tested = user_to_assign_times_tables
                     test.save()
+                settings = Settings()
+                settings.user = user_to_assign_times_tables
+                settings.save()
                 if form.cleaned_data['account_type'] == 'teacher':
                     t = Teacher()
                     t.user = user_to_assign_times_tables

@@ -4,7 +4,7 @@
 
 {% block content %}
     <h2>Times tables app</h2>
-    <p>You will have to answer a series of 25 questions on tables that your teacher has set you. You have six seconds to answer each question. Your teacher has set you these times tables.</p>
+    <p>You will have to answer a series of {{questions}} questions on tables that your teacher has set you. You have {{seconds}} seconds to answer each question. Your teacher has set you these times tables.</p>
     <table class="tablecol">
         <tbody>
         {% for test in test_list %}
@@ -24,5 +24,5 @@
         {% endfor %}
         </tbody>
       </table>
-      <h4><a href ="{% url 'student_play' %}"">Click here to start!</a></h4>
+      <h4><a href ="{% url 'student_play' %}">Click here to start!</a></h4>
 {% endblock %}
